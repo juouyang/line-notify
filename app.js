@@ -11,12 +11,12 @@ const PORT           = process.env.OPENSHIFT_NODEJS_PORT || 8888 ;
 const ADDR           = process.env.OPENSHIFT_NODEJS_IP   || '0.0.0.0' ;
 
 // LINE Notify
-const OAUTH_PAGE     = 'https://linebot.rhcloud.com/oauth.html';
-const OAUTH_REDIRECT = 'https://linebot.rhcloud.com/add-notify-user';
+const OAUTH_PAGE     = 'http://line-notify.apps.ocp.testing/oauth.html';
+const OAUTH_REDIRECT = 'http://line-notify.apps.ocp.testing/add-notify-user';
 const NFY_API        = 'https://notify-api.line.me/api/notify';
 const NFY_TOKEN_API  = 'https://notify-bot.line.me/oauth/token';
-const NFY_CLIENT_ID  = '';
-const NFY_CLIENT_SECRET = '';
+const NFY_CLIENT_ID  = process.env.CLIENT_ID;
+const NFY_CLIENT_SECRET = process.env.CLIENT_SECRET;
 const NOTIFY_FILE    = 'notify-users.json';
 let   notifyUsers    = {};
 
@@ -49,9 +49,9 @@ const getNotifyToken = (code) => {
       url: NFY_TOKEN_API,
       form: {
         "grant_type": "authorization_code",
-        "redirect_uri": OAUTH_REDIRECT, 
+        "redirect_uri": OAUTH_REDIRECT,
         "client_id": NFY_CLIENT_ID,
-        "client_secret": NFY_CLIENT_SECRET, 
+        "client_secret": NFY_CLIENT_SECRET,
         "code": code,
       },
     }, (err, response, body) => {
@@ -67,10 +67,10 @@ const getNotifyToken = (code) => {
 
 const readFile = (file) => {
   let ret = {};
-  try { 
+  try {
     let data = fs.readFileSync(file, 'utf8');
     if(data) {
-      ret = JSON.parse(data); 
+      ret = JSON.parse(data);
     }
   } catch(e) {
     console.dir(e);
@@ -80,9 +80,9 @@ const readFile = (file) => {
 };
 
 const writeFile = (file, data) => {
-  try { 
+  try {
     let _data = JSON.stringify(data);
-    fs.writeFileSync(file, _data, 'utf8');     
+    fs.writeFileSync(file, _data, 'utf8');
   } catch(e) {
     console.dir(e);
   }
@@ -114,7 +114,7 @@ app.get('/add-notify-user', async(req, res) => {
     notifyUsers[code] = {};
     notifyUsers[code].token = body.access_token;
     notifyUsers[code].state = req.query.state;
-    writeFile(NOTIFY_FILE, notifyUsers);  
+    writeFile(NOTIFY_FILE, notifyUsers);
     return res.send('Success to save! Code=' + req.query.code + '\nState=' + req.query.state);
   } catch(e) {
     console.dir(e);
