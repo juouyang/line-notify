@@ -7,7 +7,7 @@ const fs             = require('fs');
 const request        = require("request");
 const http           = require('http');
 const app            = express();
-const PORT           = process.env.OPENSHIFT_NODEJS_PORT || 8888 ;
+const PORT           = 8080 ;
 const ADDR           = process.env.OPENSHIFT_NODEJS_IP   || '0.0.0.0' ;
 
 // LINE Notify
