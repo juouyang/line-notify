@@ -122,6 +122,54 @@ app.get('/add-notify-user', async(req, res) => {
   }
 });
 
+// Webhook for LINE Notify
+
+/*
+  body: {
+    receiver: 'Default',
+    status: 'firing',
+    alerts: [ [Object] ],
+    groupLabels: { namespace: 'openshift-cluster-version' },
+    commonLabels: {
+      alertname: 'UpdateAvailable',
+      channel: 'stable-4.8',
+      endpoint: 'metrics',
+      instance: '',
+      job: 'cluster-version-operator',
+      namespace: 'openshift-cluster-version',
+      pod: 'cluster-version-operator-5b9fd959df-hs54m',
+      prometheus: 'openshift-monitoring/k8s',
+      service: 'cluster-version-operator',
+      severity: 'info',
+      upstream: '<default>'
+    },
+    commonAnnotations: {
+      message: "Your upstream update recommendation service recommends you update your cluster.  For more information refer to 'oc adm upgrade' or https://console-openshift-console.apps.ocp.testing/settings/cluster/."
+    },
+    externalURL: 'https://alertmanager-main-openshift-monitoring.apps.ocp.testing',
+    version: '4',
+    groupKey: '{}:{namespace="openshift-cluster-version"}',
+    truncatedAlerts: 0
+  }
+*/
+
+app.post('/line-notify', async(req, res) => {
+  console.log(req);
+  let message = req.body.commonAnnotations.message ? req.body.commonAnnotations.message : 'Webhook';
+  for(let code in notifyUsers) {
+    if(!(notifyUsers[code] && notifyUsers[code].token)) {
+      continue;
+    }
+    try {
+      let token = notifyUsers[code].token;
+      await sendNotify(token, message);
+    } catch(e) {
+      console.dir(e);
+    }
+  }
+  return res.end();
+});
+
 // Send LINE Notify test message
 app.get('/line-notify', async(req, res) => {
   let message = req.query.message ? req.query.message : 'Test Message!';
