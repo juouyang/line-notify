@@ -154,8 +154,10 @@ app.get('/add-notify-user', async(req, res) => {
 */
 
 app.post('/line-notify', async(req, res) => {
-  console.log(req);
-  let message = req.body.commonAnnotations.message ? req.body.commonAnnotations.message : 'Webhook';
+  let message = "[" + req.body.commonLabels.severity + "] " +
+                      req.body.commonAnnotations.message ?
+                          req.body.commonAnnotations.message :
+                          "'" + JSON.stringify(req.body) + "'";
   for(let code in notifyUsers) {
     if(!(notifyUsers[code] && notifyUsers[code].token)) {
       continue;
